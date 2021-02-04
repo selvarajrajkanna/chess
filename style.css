@@ -1,0 +1,67 @@
+body {
+	margin: 0;
+}
+.chess-board {
+	height: 100%;
+	width: 100%;
+	box-shadow: 0px 0px 4px 0px #d4d4d4;
+	float: left;
+}
+.chess-box {
+	float: left;
+	width: 12.5%;
+	height: 12.5%;
+	background-color: white;
+	background-size: contain;
+    background-repeat: no-repeat;
+}
+.chess-box.active, .chess-box.shade.active {
+	background-color: red;
+}
+.chess-box.shade {
+	background-color: grey;
+}
+
+
+.chess-box.pawn_b {
+	background-image: url('./assets/pawn_b.png');
+}
+.chess-box.pawn_w {
+	background-image: url('./assets/pawn_w.png');
+}
+.chess-box.rook_w {
+	background-image: url('./assets/rook_w.png');
+}
+.chess-box.rook_b {
+	background-image: url('./assets/rook_b.png');
+}
+.chess-box.knight_w {
+	background-image: url('./assets/knight_w.png');
+}
+.chess-box.knight_b {
+	background-image: url('./assets/knight_b.png');
+}
+.chess-box.bishop_w {
+	background-image: url('./assets/bishop_w.png');
+}
+.chess-box.bishop_b {
+	background-image: url('./assets/bishop_b.png');
+}
+.chess-box.king_w {
+	background-image: url('./assets/king_w.png');
+}
+.chess-box.king_b {
+	background-image: url('./assets/king_b.png');
+}
+.chess-box.queen_w {
+	background-image: url('./assets/queen_w.png');
+}
+.chess-box.queen_b {
+	background-image: url('./assets/queen_b.png');
+}
+
+
+
+.marker {
+	float: right;
+}
