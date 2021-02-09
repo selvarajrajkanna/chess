@@ -278,26 +278,27 @@ function replace_coin(ele) {
 function check_legal_move_pawn(current_box_ele, target_box_ele) {
 	let movement_side = -1;
 
-	current_axis = convertIdToAxis(current_box_ele.id);
-	current_x_place = current_axis[0];
-	current_y_place = current_axis[1];
+	let current_axis = convertIdToAxis(current_box_ele.id);
+	let current_x_place = current_axis[0];
+	let current_y_place = current_axis[1];
 
-	target_axis = convertIdToAxis(target_box_ele.id);
-	target_x_place = target_axis[0];
-	target_y_place = target_axis[1];
+	let target_axis = convertIdToAxis(target_box_ele.id);
+	let target_x_place = target_axis[0];
+	let target_y_place = target_axis[1];
+
+	let target_box_color = target_box_ele.getAttribute('data-type');
 
 	is_legal = false;
 	if(current_x_place + movement_side*target_x_place > 0  ) {  // check if movement is forward only
 		notInfront = checkIfCoinNotInfront(current_box_ele);
 		if(notInfront.status) {  // to check if any coin infront by one place
 			if( (Math.abs(current_x_place - target_x_place) == 1 && current_y_place == target_y_place) || (Math.abs(current_x_place - target_x_place) == 2 && current_x_place == board_size - 2) ) {
-				let target_box_color = target_box_ele.getAttribute('data-type');
 				if(target_box_color != opposive_side) {
 					is_legal = true;
 				}
 			}
 		} else {
-			if(Math.abs(current_y_place - target_y_place) == 1 && opposive_side == notInfront.coin_color )  {
+			if(Math.abs(current_y_place - target_y_place) == 1 && (opposive_side == notInfront.coin_color || target_box_color == opposive_side) )  {
 				is_legal = true;
 			}
 		}
