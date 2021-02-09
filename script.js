@@ -256,7 +256,7 @@ function convertIdToAxis(id) {
 	let cur_place = id.split(' ');
 	let x_place = cur_place[0].split('x')[1];
 	let y_place = cur_place[1].split('y')[1];
-	return [x_place, y_place];
+	return [parseInt(x_place), parseInt(y_place)];
 }
 
 function replace_coin(ele) {
@@ -276,6 +276,7 @@ function replace_coin(ele) {
 /*  checking chess move validity  */
 
 function check_legal_move_pawn(current_box_ele, target_box_ele) {
+	let movement_side = -1;
 
 	current_axis = convertIdToAxis(current_box_ele.id);
 	current_x_place = current_axis[0];
@@ -286,32 +287,39 @@ function check_legal_move_pawn(current_box_ele, target_box_ele) {
 	target_y_place = target_axis[1];
 
 	is_legal = false;
-	
-	if(current_x_place > target_x_place  ) {
-		if(Math.abs(current_x_place - target_x_place) == 1 || (Math.abs(current_x_place - target_x_place) == 2 && current_x_place == board_size - 2) ) {
-			let target_box_color = target_box_ele.getAttribute('data-type');
-			if(target_box_color != opposive_side) {
+	if(current_x_place + movement_side*target_x_place > 0  ) {  // check if movement is forward only
+		notInfront = checkIfCoinNotInfront(current_box_ele);
+		if(notInfront.status) {  // to check if any coin infront by one place
+			if( (Math.abs(current_x_place - target_x_place) == 1 && current_y_place == target_y_place) || (Math.abs(current_x_place - target_x_place) == 2 && current_x_place == board_size - 2) ) {
+				let target_box_color = target_box_ele.getAttribute('data-type');
+				if(target_box_color != opposive_side) {
+					is_legal = true;
+				}
+			}
+		} else {
+			if(Math.abs(current_y_place - target_y_place) == 1 && opposive_side == notInfront.coin_color )  {
 				is_legal = true;
 			}
 		}
 	};
 
-	if(is_legal) {
-		console.log(target_y_place);
-		console.log(current_y_place);
-		console.log(target_y_place == current_y_place);
-		if(target_y_place == current_y_place || target_box_color == opposive_side && (true) )  {
-			
-		}
-	}
-
 
 	return is_legal;
 };
 
-function checkIfCoinNotInfront(current) {
-	if(chess_matrix[(parseInt(current[0]) - 1).toString()][(parseInt(current[1]) - 1).toString()] == '' ) {
-		return true;
+function checkIfCoinNotInfront(current_ele) {
+	let current = convertIdToAxis(current_ele.id);
+	let movement_side = -1;
+
+	let coin_color = '';
+
+	let infront_ele = document.getElementById('x'+ (current[0] + movement_side*1) + ' ' + 'y'+current[1]);
+	if(infront_ele) {
+		coin_color = infront_ele.getAttribute('data-type');
+	}
+
+	if(chess_matrix[current[0] + movement_side*1][current[1]] == '' ) {
+		return { 'status': true, 'coin_color':coin_color };
 	};
-	return false;
+	return { 'status': false, 'coin_color':coin_color };
 };
