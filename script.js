@@ -313,7 +313,7 @@ function checkIfCoinNotInfront(current_ele) {
 
 	let coin_color = '';
 
-	let infront_ele = document.getElementById('x'+ (current[0] + movement_side*1) + ' ' + 'y'+current[1]);
+	let infront_ele = document.getElementById('x'+ (current[0] + movement_side*1) + ' ' + 'y'+ current[1] );
 	if(infront_ele) {
 		coin_color = infront_ele.getAttribute('data-type');
 	}
