@@ -11,8 +11,26 @@ window.onresize = function(){
 var chess_dom;
 
 var chess_sides = {'black': 'black', 'white': 'white'};
-var active_side = chess_sides.black;
-var opposive_side = chess_sides.white;
+
+var chess_sides_toggle_helper = {true: chess_sides.white, false: chess_sides.black};
+
+var active_side = chess_sides.white;
+var opposive_side = chess_sides.black;
+var movement_side = -1;
+
+var current_playing_side = {
+	coin: active_side,
+	get current() {
+		return this.coin;
+	},
+	toggle: function() {
+		this.coin = chess_sides_toggle_helper[!(this.coin == chess_sides.white)];
+		active_side = this.coin;
+		opposive_side = chess_sides_toggle_helper[!(this.coin == chess_sides.white)];
+		
+		movement_side = active_side == chess_sides.black ? 1 : -1;
+	}
+}
 
 function setChessBox() {
 	var chess_dom = document.getElementById("chessBoard");
@@ -37,7 +55,7 @@ function formChessBoard() {
 	    for(var y = 0 ; y < board_size; y++){
 	    	let coin_type = '';
 	        chess_matrix[x][y] = '';
-	        if(x == 0) {
+	        if(x == board_size - 1) {
 	        	chess_matrix[x][0] = 'rook_w';
 	        	chess_matrix[x][board_size - 1] = 'rook_w';
 
@@ -53,17 +71,17 @@ function formChessBoard() {
 	        	coin_type = 'white';
 	        }
 
-	        if(x == 1) {
+	        if(x == board_size - 2) {
 	        	chess_matrix[x][y] = 'pawn_w';
 	        	coin_type = 'white';
 	        }
 
-	        if(x == board_size - 2) {
+	        if(x == 1) {
 	        	chess_matrix[x][y] = 'pawn_b';
 	        	coin_type = 'black';
 	        }
 
-	        if(x == board_size - 1) {
+	        if(x == 0) {
 	        	chess_matrix[x][0] = 'rook_b';
 	        	chess_matrix[x][board_size - 1] = 'rook_b';
 
@@ -157,6 +175,8 @@ function second_click(ele) {
 	};
 
 	last_selected_piece.set_coin = undefined;
+
+	current_playing_side.toggle();
 
 	return ;
 
@@ -276,7 +296,6 @@ function replace_coin(ele) {
 /*  checking chess move validity  */
 
 function check_legal_move_pawn(current_box_ele, target_box_ele) {
-	let movement_side = -1;
 
 	let current_axis = convertIdToAxis(current_box_ele.id);
 	let current_x_place = current_axis[0];
@@ -292,14 +311,17 @@ function check_legal_move_pawn(current_box_ele, target_box_ele) {
 	if(current_x_place + movement_side*target_x_place > 0  ) {  // check if movement is forward only
 		notInfront = checkIfCoinNotInfront(current_box_ele);
 		if(notInfront.status) {  // to check if any coin infront by one place
-			if( (Math.abs(current_x_place - target_x_place) == 1 && current_y_place == target_y_place) || (Math.abs(current_x_place - target_x_place) == 2 && current_x_place == board_size - 2) ) {
-				if(target_box_color != opposive_side) {
+			let board_side_start_place = movement_side == -1 ? board_size : -1;
+			if( (Math.abs(current_x_place - target_x_place) == 1 && current_y_place == target_y_place) || (Math.abs(current_x_place - target_x_place) == 2 && current_x_place == board_side_start_place + (movement_side * 2) ) ) {
+				if(target_box_color != opposive_side || ( (Math.abs(current_x_place - target_x_place) == 1) && target_box_color == opposive_side) ) {
 					is_legal = true;
 				}
 			}
 		} else {
 			if(Math.abs(current_y_place - target_y_place) == 1 && (opposive_side == notInfront.coin_color || target_box_color == opposive_side) )  {
-				is_legal = true;
+				if((Math.abs(current_x_place - target_x_place) == 1) && target_box_color == opposive_side) {
+					is_legal = true;
+				};
 			}
 		}
 	};
@@ -310,7 +332,6 @@ function check_legal_move_pawn(current_box_ele, target_box_ele) {
 
 function checkIfCoinNotInfront(current_ele) {
 	let current = convertIdToAxis(current_ele.id);
-	let movement_side = -1;
 
 	let coin_color = '';
 
@@ -324,3 +345,14 @@ function checkIfCoinNotInfront(current_ele) {
 	};
 	return { 'status': false, 'coin_color':coin_color };
 };
+
+function checkIfCoinInDiagonal1Place(current_ele) {
+	let current = convertIdToAxis(current_ele.id);
+	console.log('x' + ( current[0] + (movement_side*1) ) + ' y' + ( current[1] + (movement_side*1) ));
+	let oneDiag = document.getElementById('x' + ( current[0] + (movement_side*1) ) + ' y' + ( current[1] + (movement_side*1) ) );
+	let diagColor = oneDiag.getAttribute('data-type');
+	if(diagColor == opposive_side) {
+		return { 'status': true, coin_color: diagColor };
+	}
+	return {'status': false, coin_color: diagColor};
+}
